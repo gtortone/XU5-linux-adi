@@ -1,0 +1,121 @@
+
+// SPDX-License-Identifier: GPL-2.0
+/*
+ * Analog Devices AD7768-1
+ * https://www.analog.com/en/products/ad7768-1.html
+ * https://wiki.analog.com/resources/tools-software/linux-build/generic/socfpga
+ *
+ * hdl_project: <ad77681evb/de10>
+ * board_revision: <A>
+ *
+ * Copyright (C) 2020 Analog Devices Inc.
+ */
+/dts-v1/;
+#include "socfpga_cyclone5_de10_nano.dtsi"
+#include <dt-bindings/interrupt-controller/irq.h>
+#include <dt-bindings/gpio/gpio.h>
+
+
+/ {
+	vref: regulator-vref {
+		compatible = "regulator-fixed";
+		regulator-name = "fixed-supply";
+		regulator-min-microvolt = <4096000>;
+		regulator-max-microvolt = <4096000>;
+		regulator-always-on;
+	};
+
+	clocks {
+		sys_clk: sys_clk@2 {
+			#clock-cells = <0>;
+			compatible = "fixed-clock";
+			clock-frequency = <50000000>;
+			clock-output-names = "system_clock";
+		};
+	};
+
+
+	soc {
+		sys_hps_bridges: bridge@c0000000 {
+			compatible = "simple-bus";
+			reg = <0xff200000 0x00200000>;
+			#address-cells = <1>;
+			#size-cells = <1>;
+			ranges = <0x00000000 0xff200000 0x00200000>;
+/*
+			sys_gpio_in: gpio@100010100 {
+				compatible = "altr,pio-18.1", "altr,pio-1.0";
+				reg = <0x00010100 0x00000010>;
+				interrupt-parent = <&intc>;
+				interrupts = <0 42 IRQ_TYPE_LEVEL_HIGH>;
+				altr,gpio-bank-width = <32>;
+				altr,interrupt-type = <4>;
+				altr,interrupt_type = <4>;
+				level_trigger = <1>;
+				resetvalue = <0>;
+				#gpio-cells = <2>;
+				gpio-controller;
+			};
+*/
+
+			sys_gpio_out: gpio@100109000 {
+				compatible = "altr,pio-1.0";
+				reg = <0x00109000 0x00000010>;
+				altr,gpio-bank-width = <32>;
+				resetvalue = <0>;
+				#gpio-cells = <2>;
+				gpio-controller;
+			};
+
+			rx_dma: rx-dmac@100020000 {
+				compatible = "adi,axi-dmac-1.00.a";
+				reg = <0x00020000 0x00000800>;
+				interrupt-parent = <&intc>;
+				interrupts = <0 43 IRQ_TYPE_LEVEL_HIGH>;
+				#dma-cells = <1>;
+				clocks = <&sys_clk>;
+				
+				adi,channels {
+					#size-cells = <0>;
+					#address-cells = <1>;
+
+					dma-channel@0 {
+						reg = <0>;
+						adi,source-bus-width = <32>;
+						adi,source-bus-type = <1>;
+						adi,destination-bus-width = <64>;
+						adi,destination-bus-type = <0>;
+					};
+				};
+			};
+/*
+			axi_spi_engine: spi_engine@100028000 {
+				compatible = "adi,axi-spi-engine-1.00.a";
+				reg = <0x00028000 0x00008000>;
+				interrupt-parent = <&intc>;
+				interrupts = <0 44 IRQ_TYPE_LEVEL_HIGH>;
+				clocks = <&sys_clk &sys_clk>;
+				clock-names = "avalon_clk", "spi_clk";
+				num-cs = <1>;
+
+				#address-cells = <0x1>;
+				#size-cells = <0x0>;
+
+				ad7768_1: adc@0 {
+					compatible = "adi,ad7768-1";
+					reg = <0>;
+					spi-max-frequency = <2000000>;
+					spi-cpol;
+					spi-cpha;
+					vref-supply = <&vref>;
+					interrupts = <91 IRQ_TYPE_EDGE_RISING>;
+					interrupt-parent = <&sys_gpio_in>;
+					adi,sync-in-gpios = <&sys_gpio_in 87 GPIO_ACTIVE_LOW>;
+					reset-gpios = <&sys_gpio_in 86 GPIO_ACTIVE_LOW>;
+					clocks = <&sys_clk>;
+					clock-names = "sampl_clk";
+				};
+			};*/
+		};
+	};
+};

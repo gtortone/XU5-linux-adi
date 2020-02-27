@@ -110,10 +110,13 @@ static struct iio_chan_spec name[] = {	\
 		AD7768_CHAN(1), \
 		AD7768_CHAN(2), \
 		AD7768_CHAN(3), \
+<<<<<<< HEAD
+=======
 		AD7768_CHAN(4), \
 		AD7768_CHAN(5), \
 		AD7768_CHAN(6), \
 		AD7768_CHAN(7), \
+>>>>>>> 1a3c41b9e45dc7b9f87689f478ba543db5f1bc58
 }
 
 DECLARE_AD7768_CHANNELS(ad7768_channels);
